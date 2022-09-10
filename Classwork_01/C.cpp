@@ -9,10 +9,10 @@ void swap(void* i, void* j, size_t type_size) {
   std::memcpy(i, tmp, type_size);
   free(tmp);
 }
-void* move(void* arr, int move_to)
+void* move(void* arr, int move_to, int type_size)
 {
     char* ptr_current = reinterpret_cast <char*>(arr);
-        ptr_current += move_to;
+        ptr_current += move_to * type_size;
         return arr = reinterpret_cast <void*>(ptr_current);
 }
 int compareInt(void *lhs, void *rhs)
@@ -23,32 +23,32 @@ int compareInt(void *lhs, void *rhs)
     }
     return 0;
 }
-int part(void* A, int lo, int hi, void* (*next)(void*, int), int type_size,int (*compare)(void *, void *)) {
-    void* pivot = next(A, (hi + lo) / 2);
-    int i = lo;
-    int j = hi;
+int part(void* arr, int left, int right, int type_size,int (*compare)(void *, void *)) {
+    void* pivot = move(arr, (left + right) / 2, type_size);
+    int i = left;
+    int j =  right;
     while (true) {
-        while (compare(next(A, i), pivot)== 0) {
+        while (compare(pivot, move(arr, i, type_size))== 1) {
             i++;
         }
-        while (compare(next(A, j), pivot)== 1) {
+        while (compare(move(arr, j, type_size), pivot)== 1) {
             j--;
         }
         if (i >= j) {
             return j;
         }
-        swap(next(A, i), next(A, j), type_size);
+        swap(move(arr, i, type_size), move(arr, j, type_size), type_size);
         i++;
         j--;
     }
 }
 
-void quicksort(void* A, int lo, int hi, void* (*next)(void*, int), int type_size)
+void quicksort(void* arr, int left, int right, int type_size, int (*compare)(void *, void *))
 {
-    if (lo < hi) {
-        int p = part(A, lo, hi, next, type_size,compareInt);
-        quicksort(A, lo, p, next, type_size);
-        quicksort(A, p + 1, hi, next, type_size);
+    if (left < right) {
+        int p = part(arr, left, right,type_size,compare);
+        quicksort(arr, left, p, type_size, compare );
+        quicksort(arr, p + 1, right, type_size, compare);
     }
 }
 
@@ -62,10 +62,10 @@ int main()
     {
         std::cin>>arr[i];
     }
-    quicksort(arr,0, (arr_size-1), sizeof(int) );
+    quicksort(arr,0, (arr_size-1), sizeof(int), compareInt);
     for(int i = 0; i < arr_size; i++)
     {
-       std:: cout <<arr[i]<<std::endl;
+       std:: cout <<arr[i]<<" ";
     }
 
 return 0;
