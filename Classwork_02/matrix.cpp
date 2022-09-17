@@ -1,30 +1,43 @@
 #include <iostream>
 #include <math.h>
 
-class Matrix {
+class Matrix
+{
     public:
-        Matrix(int arr[], std::size_t n_elements) // Заполнение матрицы из массива
+        Matrix(int arr[], size_t n_elements)
         {
-            for(int m = 0; m < n_elements; m++)
+            int length = 0;
+            size = int(sqrt(n_elements));
+            mat = new int* [size];
+            for (int i = 0; i < size; i++)
             {
-                for(int k =0; k < n_elements; k++)
+                mat[i] = new int[size];
+            }
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
                 {
-                    for(int i = 0; i < n_elements* n_elements; i++)
-                    {
-                        *mat[k,m] = arr[i];
-                    }
+                    mat[j][i] = arr[length];
+                    length++;
                 }
             }
-
         }
 
         Matrix(int element=1, std::size_t n_elements=1)  // Заполнение матрицы элементом element; n_elements -- количество элементов
         {
-            for(int j = 0; j < n_elements; j++)
+            int s = 0;
+            size = int(sqrt(n_elements));
+            mat = new int* [size];
+            for (int i = 0; i < size; i++)
             {
-                for(int i = 0; i < n_elements; i++)
+                mat[i] = new int[size];
+            }
+            for (int j = 0; j < size; j++)
+            {
+                for (int  i= 0; i < size; i++)
                 {
-                    *mat[i,j] = element;
+                    mat[i][j] = element;
+                    s++;
                 }
             }
         }
@@ -39,7 +52,7 @@ class Matrix {
             {
                 for(int i = 0; i < other.size; i++)
                 {
-                    mat[i,j] = other.mat[i,j];
+                    mat[i][j] = other.mat[i][j];
                 }
             }
 
@@ -53,21 +66,13 @@ class Matrix {
                 {
                     if (i == size - 1)
                     {
-                        std::cout<<mat[i,j]<<std::endl;
+                        std::cout<<(mat[i][j])<<std::endl;
                     }
-                    std::cout<<*mat[i,j]<<' ';
+                    else
+                    {
+                        std::cout<<(mat[i][j])<<' ';
+                    }
 
-                }
-            }
-        }
-        void operator=(Matrix &other)
-        {
-
-            for (int j =0; j < size; j++)
-            {
-                for (int i = 0; i< size; i++)
-                {
-                    *mat[i, j]= *other.mat[i,j];
                 }
             }
         }
@@ -80,11 +85,11 @@ class Matrix {
             {
                 for (int i = 0; i< size; i++)
                 {
-                    *copy_matrix.mat[i, j]= *mat[i,j];
+                    copy_matrix.mat[i][j]= mat[i][j];
                 }
             }
             int* det = new int[size];
-            for(int j = 0; j < size - 3; j++)
+            for(int j = 0; j < size; j++)
             {
                 det[j] = 1;
             }
@@ -92,14 +97,14 @@ class Matrix {
             {
                 for(int j = 0; j < copy_matrix.size ; j++)
                 {
-                    det[j]= *copy_matrix.mat[j,1];
+                    det[j]= copy_matrix.mat[j][1];
                     copy_matrix.simplify(j);
                 }
 
             }
             for (int i = 0; i < size; i++)
             {
-                det[i] *= copy_matrix.calcDeterminant_2();
+                det[i] *= copy_matrix.simplify(i).calcDeterminant_2();
                 Determinant += (pow((-1),i))*det[i];
             }
             delete[] det;
@@ -113,7 +118,7 @@ class Matrix {
             {
                 for(int i = 0; i < size; i++)
                 {
-                    *mat[i,j] *= *mat[i,j];
+                    mat[i][j] *= mat[i][j];
                 }
             }
 
@@ -121,19 +126,37 @@ class Matrix {
 
         void matTranspose()// Осуществляет транспонирование матрицы, результат сохраняется тут же
         {
+            int temp = 0;
              for(int j = 0; j < size; j++)
             {
-                for(int i = 0; i < size; i++)
+                for(int i = j; i < size; i++)
                 {
-                    *mat[i,j] = *mat[j, i];
+                    std::swap(mat[j][i],mat[i][j]);
                 }
             }
 
         }
+        int calcDeterminant_2()
+        {
+            int Det = 0;
+            if (size != 2)
+            {
+                std::cout<<"Error calculating determinant"<<std::endl;
+                return 0;
+            }
+            else
+            {
+                Det = (((mat[1][1])*(mat[2][2]))-((mat[1][2])*(mat[2][1])));
+            }
+            return Det;
+        }
 
         ~Matrix() // Определить деструктор
         {
-            delete[] mat;
+            for (int i = 0; i < size; i++) {
+                delete [] mat[i];
+            }
+            delete [] mat;
         }
 
     private:
@@ -150,7 +173,7 @@ class Matrix {
                     {
                         for(int k = 0; k < size and k != str; k++ )
                         {
-                                *new_matrix.mat[i,j]= *mat[k,m];
+                                new_matrix.mat[i][j]= mat[k][m];
 
                         }
                     }
@@ -160,26 +183,23 @@ class Matrix {
             }
         return new_matrix;
         }
-        int calcDeterminant_2()
-        {
-            if (size != 2)
-            {
-                std::cout<<"Error calculating determinant"<<std::endl;
-                return 0;
-            }
-            else return ((*mat[1,1])*(*mat[2,2])-(*mat[1,2])*(*mat[2,1]));
-        }
 };
 
 int main()
 {
-    int* arr = new int[100];
-   for(int j =0; j < 100; j++)
+    int* arr = new int[25];
+   for(int j =0; j < 25; j++)
    {
         arr[j]= j;
    }
-   Matrix matr(arr,10);
-   std::cout << matr.calcDeterminant()<<std::endl;
+   Matrix matr(arr,25);
+   matr.calcSquare();
+   matr.printMatrix();
+   matr.matTranspose();
+  matr.printMatrix();
+  Matrix matri(1, 4);
+  matri.printMatrix();
+
    delete[] arr;
    return 0;
 
