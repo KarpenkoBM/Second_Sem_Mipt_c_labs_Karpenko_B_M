@@ -113,17 +113,13 @@ Rectangle result(std::string str)
     Rectangle* mass_for_sum = new Rectangle[num_of_brack - num_of_mult];
     while(i < str.length())
     {
-        while(str[i]==' ' || str[i] == '+')
-        {
-            i++;
-        }
         //std::cout << 3 << std::endl;
         Rectangle result = Rectangle(Point(0,0));
         if(str[i] == '(')
         {
             result += make_rec(str, i);
-            result.print();
-            std::cout << 3 << std::endl;
+            //result.print();
+            //std::cout << 3 << std::endl;
         }
         if (not(++i == str.length()))
         {
@@ -136,17 +132,17 @@ Rectangle result(std::string str)
                 //std::cout << 4 << std::endl;
             }
         }
-        std::cout<<"k ="<<k<<std::endl;
-         std::cout<<"str"<<i<<' '<<str[i]<<std::endl;
+        //std::cout<<"k ="<<k<<std::endl;
+         //std::cout<<"str"<<i<<' '<<str[i]<<std::endl;
         mass_for_sum[k] = result;
-        mass_for_sum[k].print();
+        //mass_for_sum[k].print();
         k++;
         i++;
     }
     Rectangle answer = Rectangle();
     for(int i = 0; i < num_of_brack - num_of_mult; i++)
     {
-        mass_for_sum[i].print();
+        //mass_for_sum[i].print();
         answer += mass_for_sum[i];
     }
     return answer;
@@ -156,6 +152,11 @@ int main()
 {
     std :: string expression;
     std :: getline(std :: cin, expression);
+    std :: string tmp;
+    for (char c : expression)
+        if (c != ' ')
+            tmp += c;
+    expression = tmp;
     Rectangle temp = result(expression);
     temp.print();
     return 0;
